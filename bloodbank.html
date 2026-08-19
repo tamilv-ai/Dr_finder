@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedPulse TN – Blood Bank Stock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- ANTI-GRAVITY GLASSMORPHIC PRELOADER -->
+  <div id="app-preloader">
+    <div class="floating-logo flex flex-col items-center gap-3">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center font-extrabold text-emerald-400 text-2xl shadow-2xl">
+        M
+      </div>
+      <span class="text-xl font-extrabold text-main tracking-tight">MedPulse<span class="text-emerald-400">.TN</span></span>
+      <span class="text-xs text-muted font-mono tracking-widest uppercase animate-pulse">Initializing Live Infrastructure...</span>
+    </div>
+  </div>
+
+  <!-- TOP HEADER NAVBAR -->
+  <nav class="sticky top-0 z-40 border-b border-theme bg-card px-4 md:px-8 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center font-extrabold text-red-500 text-lg">🩸</div>
+        <div>
+          <span class="text-lg font-extrabold tracking-tight text-main">MedPulse<span class="text-red-500">.Blood</span></span>
+          <span class="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full font-bold ml-1.5 border border-red-500/20">TN BLOOD DIRECTORY</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="toggleTheme()" title="Toggle Light/Dark Theme" class="w-9 h-9 icon-btn-reactive text-sm flex items-center justify-center">
+          <span class="theme-icon-symbol"><i class="fa-solid fa-moon"></i></span>
+        </button>
+
+        <button onclick="openSidebar()" title="Open Menu Drawer" class="w-9 h-9 icon-btn-reactive text-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- RIGHT SLIDING SIDEBAR DRAWER (☰) -->
+  <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9990] hidden transition-opacity duration-300"></div>
+
+  <aside id="sidebar" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-card border-l border-theme z-[9999] transform translate-x-full transition-transform duration-300 p-6 flex flex-col justify-between shadow-2xl overflow-y-auto">
+    <div>
+      <div class="flex items-center justify-between border-b border-theme pb-4 mb-6">
+        <h3 class="font-extrabold text-base text-main tracking-tight">MedPulse TN Menu</h3>
+        <button onclick="closeSidebar()" class="p-1 rounded-lg text-muted hover:text-main">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <!-- DISCOVER -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">🌐 Discover</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <a href="index.html" onclick="closeSidebar()" class="drawer-item">Home</a>
+            <a href="doctors.html" class="drawer-item">Doctor Directory</a>
+            <a href="map.html" class="drawer-item">
+              <span>Live Map 🟢</span>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">24/7</span>
+            </a>
+            <a href="bloodbank.html" class="drawer-item">
+              <span>Blood Bank Stock</span>
+              <span class="text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-full font-bold">UNITS</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- PATIENT SERVICES -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">⚡ Patient Services</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <button onclick="triggerService('appointment')" class="drawer-item">Book Appointment</button>
+            <a href="queue.html" class="drawer-item">Live OPD Queue Status</a>
+            <a href="telemedicine.html" class="drawer-item">Telemedicine Portal</a>
+          </div>
+        </div>
+
+        <!-- PRACTITIONER HUB -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">🩺 Practitioner Hub</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <a href="doctor_register.html" class="drawer-item">👨‍⚕️ Doctor Onboarding Portal</a>
+            <a href="login.html" class="drawer-item bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold mb-1">
+              <span>⚙️ Admin & Staff Portal</span>
+            </a>
+            <a href="hpr.html" class="drawer-item mt-1">About HPR Verification</a>
+          </div>
+        </div>
+
+        <!-- PLATFORM -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">⚙️ Platform</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <button onclick="triggerService('emergency')" class="drawer-item danger-item text-red-400 font-bold">Emergency Help (24/7)</button>
+            <button onclick="triggerService('support')" class="drawer-item">Contact Support</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- BLOOD BANK CONTENT -->
+  <section class="px-4 md:px-8 pt-10 pb-12 max-w-7xl mx-auto w-full">
+    <div class="text-center max-w-3xl mx-auto mb-8">
+      <h1 class="text-3xl font-extrabold text-main mb-2">35 Regional Blood Banks</h1>
+      <p class="text-muted text-xs">Verify live blood group stock across Tamil Nadu district blood centers.</p>
+    </div>
+
+    <!-- SEARCH & MAP NAVIGATION BAR -->
+    <div class="bg-card border border-theme p-3 md:p-4 rounded-2xl shadow-xl flex flex-col sm:flex-row gap-3 items-stretch sm:items-center max-w-3xl mx-auto mb-6 anti-gravity-card">
+      
+      <!-- Search Input -->
+      <input 
+        type="text" 
+        id="search-hospital"
+        oninput="filterBloodBanks()"
+        placeholder="Search blood bank name, city, or location..." 
+        class="w-full bg-input border border-theme text-main px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-red-500 sm:flex-1"
+      />
+
+      <!-- District Selector -->
+      <select id="filter-district" onchange="filterBloodBanks()" class="bg-input border border-theme text-main text-xs px-3 py-3 rounded-xl focus:outline-none focus:border-red-500">
+        <option value="">All 38 Districts</option>
+        <option value="ariyalur">Ariyalur</option>
+        <option value="chengalpattu">Chengalpattu</option>
+        <option value="chennai">Chennai</option>
+        <option value="coimbatore">Coimbatore</option>
+        <option value="cuddalore">Cuddalore</option>
+        <option value="dharmapuri">Dharmapuri</option>
+        <option value="dindigul">Dindigul</option>
+        <option value="erode">Erode</option>
+        <option value="kallakurichi">Kallakurichi</option>
+        <option value="kanchipuram">Kancheepuram</option>
+        <option value="kanyakumari">Kanyakumari</option>
+        <option value="karur">Karur</option>
+        <option value="krishnagiri">Krishnagiri</option>
+        <option value="madurai">Madurai</option>
+        <option value="mayiladuthurai">Mayiladuthurai</option>
+        <option value="nagapattinam">Nagapattinam</option>
+        <option value="namakkal">Namakkal</option>
+        <option value="nilgiris">Nilgiris</option>
+        <option value="perambalur">Perambalur</option>
+        <option value="pudukkottai">Pudukkottai</option>
+        <option value="ramanathapuram">Ramanathapuram</option>
+        <option value="ranipet">Ranipet</option>
+        <option value="salem">Salem</option>
+        <option value="sivaganga">Sivaganga</option>
+        <option value="tenkasi">Tenkasi</option>
+        <option value="thanjavur">Thanjavur</option>
+        <option value="theni">Theni</option>
+        <option value="thoothukudi">Thoothukudi</option>
+        <option value="trichy">Tiruchirappalli</option>
+        <option value="tirunelveli">Tirunelveli</option>
+        <option value="tirupathur">Tirupathur</option>
+        <option value="tiruppur">Tiruppur</option>
+        <option value="tiruvallur">Tiruvallur</option>
+        <option value="tiruvannamalai">Tiruvannamalai</option>
+        <option value="tiruvarur">Tiruvarur</option>
+        <option value="vellore">Vellore</option>
+        <option value="viluppuram">Viluppuram</option>
+        <option value="virudhunagar">Virudhunagar</option>
+      </select>
+
+      <!-- View on Live Map Button -->
+      <a href="map.html" id="map-btn" onclick="redirectToMap(event)" class="map-btn bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0">
+        🗺️ View on Live Map
+      </a>
+
+    </div>
+
+    <!-- BLOOD GROUP PILLS -->
+    <div class="bg-card border border-theme p-4 rounded-2xl shadow-xl max-w-3xl mx-auto mb-8 space-y-4 anti-gravity-card">
+      <div>
+        <label class="block text-xs font-semibold text-muted uppercase mb-2">Filter by Blood Group</label>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="selectBloodGroup('')" class="blood-pill active px-3.5 py-1.5 rounded-xl text-xs font-bold border border-red-500 bg-red-600 text-white transition-all">ALL</button>
+          <button onclick="selectBloodGroup('A+')" class="blood-pill px-3.5 py-1.5 rounded-xl text-xs font-bold border border-theme bg-input text-main hover:border-red-500 transition-all">A+</button>
+          <button onclick="selectBloodGroup('A-')" class="blood-pill px-3.5 py-1.5 rounded-xl text-xs font-bold border border-theme bg-input text-main hover:border-red-500 transition-all">A-</button>
+          <button onclick="selectBloodGroup('B+')" class="blood-pill px-3.5 py-1.5 rounded-xl text-xs font-bold border border-theme bg-input text-main hover:border-red-500 transition-all">B+</button>
+          <button onclick="selectBloodGroup('B-')" class="blood-pill px-3.5 py-1.5 rounded-xl text-xs font-bold border border-theme bg-input text-main hover:border-red-500 transition-all">B-</button>
+          <button onclick="selectBloodGroup('O+')" class="blood-pill px-3.5 py-1.5 rounded-xl text-xs font-bold border border-theme bg-input text-main hover:border-red-500 transition-all">O+</button>
+          <button onclick="selectBloodGroup('O-')" class="blood-pill px-3.5 py-1.5 rounded-xl text-xs font-bold border border-theme bg-input text-main hover:border-red-500 transition-all">O-</button>
+          <button onclick="selectBloodGroup('AB+')" class="blood-pill px-3.5 py-1.5 rounded-xl text-xs font-bold border border-theme bg-input text-main hover:border-red-500 transition-all">AB+</button>
+          <button onclick="selectBloodGroup('AB-')" class="blood-pill px-3.5 py-1.5 rounded-xl text-xs font-bold border border-theme bg-input text-main hover:border-red-500 transition-all">AB-</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOOD BANK GRID -->
+    <div id="blood-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Loaded via app.js -->
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-theme py-6 px-4 bg-card text-center text-xs text-muted">
+    <p>MedPulse TN — Blood Bank Availability Directory</p>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

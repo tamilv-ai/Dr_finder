@@ -1,0 +1,550 @@
+/* Universal Theme Engine */
+:root {
+  --bg-color: #0a0e17;
+  --card-bg: #121826;
+  --card-hover: #182032;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #1f293d;
+  --input-bg: #0d1320;
+}
+
+html.light {
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --card-hover: #f1f5f9;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --border-color: #cbd5e1;
+  --input-bg: #f1f5f9;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.bg-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+.bg-input {
+  background-color: var(--input-bg) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-color) !important;
+}
+
+.text-main { color: var(--text-main) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.border-theme { border-color: var(--border-color) !important; }
+
+/* Pulse Animation Dots with Glowing Rings */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes pulseGlowAmber {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+@keyframes pulseGlowRed {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.pulse-green { background: #10b981; animation: pulseGlow 2s infinite; }
+.pulse-amber { background: #f59e0b; animation: pulseGlowAmber 2s infinite; }
+.pulse-red   { background: #ef4444; animation: pulseGlowRed 2s infinite; }
+
+/* ================= ANTI-GRAVITY ANIMATIONS & PHYSICS ================= */
+
+/* Levitation Physics for Cards & Modules */
+.anti-gravity-card {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              border-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+.anti-gravity-card:hover {
+  transform: translateY(-8px) scale(1.012);
+  box-shadow: 0 20px 35px -5px rgba(16, 185, 129, 0.2), 
+              0 10px 15px -5px rgba(0, 0, 0, 0.1);
+  border-color: rgba(16, 185, 129, 0.5) !important;
+}
+
+html.light .anti-gravity-card:hover {
+  box-shadow: 0 20px 35px -5px rgba(16, 185, 129, 0.25), 
+              0 10px 15px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* Glassmorphic Full-Screen Preloader */
+#app-preloader {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 23, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s ease;
+}
+
+html.light #app-preloader {
+  background: rgba(248, 250, 252, 0.94);
+}
+
+#app-preloader.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Floating Anti-Gravity Keyframe */
+@keyframes gravityFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+}
+
+.floating-logo {
+  animation: gravityFloat 3s ease-in-out infinite;
+}
+
+/* Slow Spin Animation for Dynamic Icons */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+/* Dynamic Tab Icon Reactions */
+.admin-tab i {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
+}
+
+.admin-tab:hover i {
+  transform: scale(1.25) rotate(-6deg);
+}
+
+.admin-tab.active i {
+  transform: scale(1.15);
+}
+
+
+/* ================= LIGHT MODE HIGH-CONTRAST OVERRIDES ================= */
+
+/* Card Shadows in Light Mode */
+html.light .bg-card {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Text Contrast Fixes for Badges and Pills */
+html.light .text-emerald-400 { color: #047857 !important; } /* Dark Emerald */
+html.light .text-amber-400   { color: #b45309 !important; } /* Dark Amber */
+html.light .text-red-400     { color: #b91c1c !important; } /* Dark Red */
+html.light .text-blue-400    { color: #1d4ed8 !important; } /* Dark Blue */
+
+/* Background Pill Overrides for Light Mode */
+html.light .bg-emerald-500\/15,
+html.light .bg-emerald-500\/10,
+html.light .bg-emerald-950\/30 {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+}
+
+html.light .bg-amber-500\/15,
+html.light .bg-amber-500\/10,
+html.light .bg-amber-950\/30 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+html.light .bg-red-500\/15,
+html.light .bg-red-500\/10,
+html.light .bg-red-950\/30 {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+html.light .bg-blue-500\/10 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+/* Blood Group Filter Pills (Unselected) */
+html.light .blood-pill:not(.active) {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+html.light .blood-pill:not(.active):hover {
+  border-color: #ef4444 !important;
+  color: #dc2626 !important;
+}
+
+/* Form Controls in Light Mode */
+html.light select,
+html.light input[type="text"] {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Leaflet Map & Drawer Layer Fixes */
+.map-medium-container {
+  max-width: 1024px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#map {
+  width: 100% !important;
+  height: 70vh !important;
+  min-height: 450px !important;
+  max-height: 600px !important;
+  z-index: 10 !important;
+  position: relative;
+}
+
+.leaflet-top.leaflet-right {
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 4500 !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4) !important;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background-color: var(--card-bg) !important;
+  color: var(--text-main) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.leaflet-tile { filter: brightness(0.7) contrast(1.1); }
+html.light .leaflet-tile { filter: none; }
+
+/* Floating GPS Action Button */
+.gps-fab {
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1000;
+  background-color: #2563eb;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  padding: 12px 24px;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
+  font-weight: 700;
+  font-size: 0.825rem;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gps-fab:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-4px) scale(1.04);
+  color: white;
+  box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.7);
+}
+
+/* ================= SIDEBAR MENU DRAWER HOVER & SELECTION PHYSICS ================= */
+.drawer-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.25s ease,
+              color 0.2s ease;
+  will-change: transform, box-shadow;
+  overflow: hidden;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.drawer-item:hover {
+  transform: translateX(-4px) scale(1.015);
+  background-color: var(--input-bg) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.18),
+              inset 4px 0 0 #10b981 !important;
+  color: #10b981 !important;
+}
+
+html.light .drawer-item:hover {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.25),
+              inset 4px 0 0 #059669 !important;
+  color: #059669 !important;
+}
+
+.drawer-item.danger-item:hover {
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.25),
+              inset 4px 0 0 #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+.drawer-item-active {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  box-shadow: inset 4px 0 0 #10b981 !important;
+  color: #10b981 !important;
+  font-weight: 700 !important;
+}
+
+html.light .drawer-item-active {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  box-shadow: inset 4px 0 0 #059669 !important;
+  color: #047857 !important;
+}
+
+/* ================= REACTIVE HEADER ICON BUTTONS & NAV ACTIONS ================= */
+.icon-btn-reactive {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.875rem;
+  border: 1px solid var(--border-theme);
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.25s ease,
+              color 0.2s ease;
+  will-change: transform, box-shadow;
+  cursor: pointer;
+}
+
+.icon-btn-reactive:hover {
+  transform: translateY(-3px) scale(1.08);
+  background-color: var(--input-bg) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  box-shadow: 0 8px 22px -4px rgba(16, 185, 129, 0.35) !important;
+  color: #10b981 !important;
+}
+
+.icon-btn-reactive:active {
+  transform: translateY(0) scale(0.95);
+  box-shadow: 0 2px 8px -2px rgba(16, 185, 129, 0.3) !important;
+}
+
+.icon-btn-reactive i {
+  color: var(--text-main);
+  transition: color 0.2s ease;
+}
+
+html.light .icon-btn-reactive {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light .icon-btn-reactive i {
+  color: #0f172a !important;
+}
+
+html.light .icon-btn-reactive:hover {
+  background-color: #ffffff !important;
+  border-color: rgba(16, 185, 129, 0.55) !important;
+  box-shadow: 0 8px 22px -4px rgba(16, 185, 129, 0.35) !important;
+  color: #059669 !important;
+}
+
+html.light .icon-btn-reactive:hover i {
+  color: #059669 !important;
+}
+
+
+/* Dynamic High-Contrast Theme Icon Styling */
+.theme-icon-symbol {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.theme-icon-symbol i {
+  font-size: 1.15rem !important;
+  display: inline-block !important;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease, filter 0.3s ease !important;
+}
+
+html.dark .theme-icon-symbol i {
+  color: #fcd34d !important; /* Bright Yellow Moon */
+  filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.7));
+}
+
+html.light .theme-icon-symbol i {
+  color: #d97706 !important; /* Deep Warm Sun Orange */
+  filter: drop-shadow(0 0 8px rgba(217, 119, 6, 0.5));
+}
+
+.theme-icon-symbol:hover i {
+  transform: rotate(20deg) scale(1.2);
+}
+
+/* ================= GIS ROUTE GUIDANCE MAP CARD & MARKERS ================= */
+
+/* Blue Pulsing GPS Origin Marker */
+.user-gps-pulse-marker {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.user-pulse-outer {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.35);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: gpsPulse 2s infinite ease-in-out;
+}
+
+.user-pulse-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2563eb;
+  box-shadow: 0 0 8px #2563eb;
+}
+
+@keyframes gpsPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+  70% { transform: scale(1.15); box-shadow: 0 0 0 12px rgba(37, 99, 235, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+/* Red Destination Pin Marker */
+.dest-pin-marker {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.dest-pin-glow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.dest-pin-glow::before {
+  content: '';
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.4);
+  animation: destGlow 2s infinite ease-out;
+  z-index: 1;
+}
+
+.dest-pin-glow i {
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 4px 10px rgba(239, 68, 68, 0.6));
+}
+
+@keyframes destGlow {
+  0% { transform: scale(0.8); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Floating Glassmorphism Overlay Card Overrides */
+#route-guidance-card {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 0 2px 1px rgba(255, 255, 255, 0.1);
+}
+
+html.light #route-guidance-card {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(226, 232, 240, 0.9) !important;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+}
+
+
+
+

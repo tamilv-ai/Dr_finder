@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedPulse TN – Emergency GIS Map</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- ANTI-GRAVITY GLASSMORPHIC PRELOADER -->
+  <div id="app-preloader">
+    <div class="floating-logo flex flex-col items-center gap-3">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center font-extrabold text-emerald-400 text-2xl shadow-2xl">
+        🗺️
+      </div>
+      <span class="text-xl font-extrabold text-main tracking-tight">MedPulse<span class="text-emerald-400">.GIS</span></span>
+      <span class="text-xs text-muted font-mono tracking-widest uppercase animate-pulse">Initializing Vector Map Tiles...</span>
+    </div>
+  </div>
+
+  <!-- TOP HEADER NAVBAR -->
+  <nav class="sticky top-0 z-40 border-b border-theme bg-card px-4 md:px-8 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center font-extrabold text-emerald-400 text-lg">🗺️</div>
+        <div>
+          <span class="text-lg font-extrabold tracking-tight text-main">MedPulse<span class="text-emerald-400">.GIS</span></span>
+          <span class="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full font-bold ml-1.5 border border-red-500/20">24/7 TRAUMA & OPD</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="toggleTheme()" title="Toggle Light/Dark Theme" class="w-9 h-9 icon-btn-reactive text-sm flex items-center justify-center">
+          <span class="theme-icon-symbol"><i class="fa-solid fa-moon"></i></span>
+        </button>
+
+        <button onclick="openSidebar()" title="Open Menu Drawer" class="w-9 h-9 icon-btn-reactive text-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- RIGHT SLIDING SIDEBAR DRAWER (☰) -->
+  <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9990] hidden transition-opacity duration-300"></div>
+
+  <aside id="sidebar" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-card border-l border-theme z-[9999] transform translate-x-full transition-transform duration-300 p-6 flex flex-col justify-between shadow-2xl overflow-y-auto">
+    <div>
+      <div class="flex items-center justify-between border-b border-theme pb-4 mb-6">
+        <h3 class="font-extrabold text-base text-main tracking-tight">MedPulse TN Menu</h3>
+        <button onclick="closeSidebar()" class="p-1 rounded-lg text-muted hover:text-main">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <!-- DISCOVER -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">🌐 Discover</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <a href="index.html" onclick="closeSidebar()" class="drawer-item">Home</a>
+            <a href="doctors.html" class="drawer-item">Doctor Directory</a>
+            <a href="map.html" class="drawer-item">
+              <span>Live Map 🟢</span>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">24/7</span>
+            </a>
+            <a href="bloodbank.html" class="drawer-item">
+              <span>Blood Bank Stock</span>
+              <span class="text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-full font-bold">UNITS</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- PATIENT SERVICES -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">⚡ Patient Services</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <button onclick="triggerService('appointment')" class="drawer-item">Book Appointment</button>
+            <a href="queue.html" class="drawer-item">Live OPD Queue Status</a>
+            <a href="telemedicine.html" class="drawer-item">Telemedicine Portal</a>
+          </div>
+        </div>
+
+        <!-- PRACTITIONER HUB -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">🩺 Practitioner Hub</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <a href="doctor_register.html" class="drawer-item">👨‍⚕️ Doctor Onboarding Portal</a>
+            <a href="login.html" class="drawer-item bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold mb-1">
+              <span>⚙️ Admin & Staff Portal</span>
+            </a>
+            <a href="hpr.html" class="drawer-item mt-1">About HPR Verification</a>
+          </div>
+        </div>
+
+        <!-- PLATFORM -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">⚙️ Platform</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <button onclick="triggerService('emergency')" class="drawer-item danger-item text-red-400 font-bold">Emergency Help (24/7)</button>
+            <button onclick="triggerService('support')" class="drawer-item">Contact Support</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAP CONTAINER -->
+  <section class="px-4 md:px-8 pt-6 pb-12 max-w-[1024px] mx-auto w-full flex-grow relative">
+    <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-extrabold text-main">Statewide Emergency GIS Map</h1>
+        <p class="text-xs text-muted mt-1">Interactive GIS mapping covering all 38 Tamil Nadu district health centers.</p>
+      </div>
+
+      <div class="flex items-center gap-4 text-xs bg-card border border-theme p-3 rounded-xl anti-gravity-card">
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Available</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> In OT</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Off Duty</span>
+      </div>
+    </div>
+
+    <div class="relative rounded-3xl overflow-hidden border border-theme shadow-2xl">
+      <!-- FLOATING GIS ROUTE GUIDANCE CARD (TOP-LEFT OVERLAY) -->
+      <div id="route-guidance-card" class="hidden absolute top-4 left-4 z-[4000] w-80 max-w-[calc(100%-2rem)] bg-card/90 backdrop-blur-xl border border-theme rounded-2xl p-4 shadow-2xl transition-all duration-300">
+        
+        <!-- CARD HEADER -->
+        <div class="flex items-start justify-between gap-2 mb-3">
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase text-emerald-400 tracking-wider mb-1">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>LIVE ROUTE GUIDANCE</span>
+            </div>
+            <h3 id="route-card-title" class="font-extrabold text-base text-main leading-tight">Stanley Govt Hospital</h3>
+            <p id="route-card-subtitle" class="text-xs text-muted mt-0.5">Royapuram, Chennai</p>
+          </div>
+          <button onclick="closeRouteGuidanceCard()" title="Dismiss Route Card" class="text-muted hover:text-main text-lg font-bold p-1 leading-none rounded-lg hover:bg-input transition-all">
+            &times;
+          </button>
+        </div>
+
+        <!-- METRICS GRID (2 COLUMNS) -->
+        <div class="grid grid-cols-2 gap-2.5 mb-3.5">
+          <!-- DISTANCE BOX -->
+          <div class="bg-input/60 border border-theme rounded-xl p-2.5 text-center">
+            <span class="block text-[10px] font-extrabold uppercase text-muted tracking-wider mb-0.5">DISTANCE</span>
+            <div class="flex items-center justify-center gap-1 text-blue-500 font-extrabold text-xs md:text-sm">
+              <i class="fa-solid fa-location-dot text-red-500 me-0.5"></i>
+              <span id="route-card-distance">357.7 km</span>
+            </div>
+          </div>
+
+          <!-- EST. TIME BOX -->
+          <div class="bg-input/60 border border-theme rounded-xl p-2.5 text-center">
+            <span class="block text-[10px] font-extrabold uppercase text-muted tracking-wider mb-0.5">EST. TIME</span>
+            <div class="flex items-center justify-center gap-1 text-emerald-500 font-extrabold text-xs md:text-sm">
+              <i class="fa-solid fa-clock text-emerald-400 me-0.5"></i>
+              <span id="route-card-time">~8 hr 57 mins</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTON -->
+        <a id="route-card-gmaps-btn" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 transition-all">
+          <i class="fa-solid fa-diamond-turn-right text-sm"></i>
+          <span>Open Directions in Google Maps</span>
+        </a>
+      </div>
+
+      <!-- FLOATING GOOGLE MAPS STYLE GPS FAB BUTTON -->
+      <button onclick="findNearMeMap()" id="btn-map-near-me" class="gps-fab shadow-xl">
+        <i class="fa-solid fa-location-crosshairs me-2"></i> Your Current Location
+      </button>
+
+      <div id="map" class="w-full h-[70vh] min-h-[450px] max-h-[600px] z-10"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-theme py-6 px-4 md:px-8 bg-card text-center text-xs text-muted">
+    <p>MedPulse TN — OpenStreetMap & Leaflet Integration</p>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practitioner Career & Onboarding Portal – MedPulse TN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- ANTI-GRAVITY GLASSMORPHIC PRELOADER -->
+  <div id="app-preloader">
+    <div class="floating-logo flex flex-col items-center gap-3 text-center">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-2xl text-2xl font-bold">
+        <i class="fa-solid fa-user-doctor"></i>
+      </div>
+      <span class="text-xl font-extrabold text-main tracking-tight">MedPulse<span class="text-emerald-400">.Careers</span></span>
+      <span class="text-xs text-muted font-mono tracking-widest uppercase animate-pulse">Initializing Practitioner Portal...</span>
+    </div>
+  </div>
+
+  <!-- TOP HEADER NAVBAR -->
+  <nav class="sticky top-0 z-40 border-b border-theme bg-card px-4 md:px-8 py-3.5 shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center font-extrabold text-emerald-400 text-lg">
+          <i class="fa-solid fa-user-doctor"></i>
+        </div>
+        <div>
+          <span class="text-lg font-extrabold tracking-tight text-main">MedPulse<span class="text-emerald-400">.Careers</span></span>
+          <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold ml-1.5 border border-emerald-500/20">DOCTOR ONBOARDING</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2.5">
+        <a href="index.html" title="Return to Index" class="hidden sm:flex items-center gap-1.5 text-xs text-muted hover:text-emerald-400 font-semibold px-3 py-2 rounded-xl border border-theme bg-input transition-all">
+          ← Back to Public Portal
+        </a>
+
+        <button onclick="toggleTheme()" title="Toggle Light/Dark Theme" class="w-9 h-9 icon-btn-reactive text-sm flex items-center justify-center">
+          <span class="theme-icon-symbol"><i class="fa-solid fa-moon"></i></span>
+        </button>
+
+        <button onclick="openSidebar()" title="Open Menu Drawer" class="w-9 h-9 icon-btn-reactive text-sm flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- RIGHT SLIDING SIDEBAR DRAWER (☰) -->
+  <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9990] hidden transition-opacity duration-300"></div>
+
+  <aside id="sidebar" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-card border-l border-theme z-[9999] transform translate-x-full transition-transform duration-300 p-6 flex flex-col justify-between shadow-2xl overflow-y-auto">
+    <div>
+      <div class="flex items-center justify-between border-b border-theme pb-4 mb-6">
+        <h3 class="font-extrabold text-base text-main tracking-tight">MedPulse TN Menu</h3>
+        <button onclick="closeSidebar()" class="p-1 rounded-lg text-muted hover:text-main">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <!-- DISCOVER -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">🌐 Discover</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <a href="index.html" onclick="closeSidebar()" class="drawer-item">Home</a>
+            <a href="doctors.html" class="drawer-item">Doctor Directory</a>
+            <a href="map.html" class="drawer-item">Live Map 🟢</a>
+            <a href="bloodbank.html" class="drawer-item">Blood Bank Stock</a>
+          </div>
+        </div>
+
+        <!-- PATIENT SERVICES -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">⚡ Patient Services</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <a href="queue.html" class="drawer-item">Live OPD Queue Status</a>
+            <a href="telemedicine.html" class="drawer-item">Telemedicine Portal</a>
+          </div>
+        </div>
+
+        <!-- PRACTITIONER HUB -->
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">🩺 Practitioner Hub</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <a href="doctor_register.html" class="drawer-item drawer-item-active">👨‍⚕️ Doctor Onboarding Portal</a>
+            <a href="login.html" class="drawer-item">⚙️ Admin & Staff Portal</a>
+            <a href="hpr.html" class="drawer-item mt-1">About HPR Verification</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN REGISTRATION CONTAINER -->
+  <main class="max-w-4xl mx-auto px-4 md:px-8 py-10 w-full flex-grow">
+    
+    <!-- HERO HEADER BANNER -->
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-extrabold mb-3">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Tamil Nadu Medical Health Services (TNMHS) Panel
+      </div>
+      <h1 class="text-2xl md:text-4xl font-extrabold text-main tracking-tight">Practitioner Registration & Verification</h1>
+      <p class="text-xs md:text-sm text-muted mt-2">Connecting unemployed, locum, and private specialist doctors with state hospital vacancies across 38 districts of Tamil Nadu.</p>
+    </div>
+
+    <!-- REGISTRATION FORM CARD -->
+    <div id="registration-card" class="bg-card border border-theme rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden anti-gravity-card">
+      
+      <form onsubmit="handleDoctorRegistration(event)" class="space-y-8">
+        
+        <!-- SECTION 1: PERSONAL & PREFERRED DISTRICT -->
+        <div>
+          <div class="flex items-center gap-2 border-b border-theme pb-3 mb-5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">1</div>
+            <h2 class="text-base font-extrabold text-main">Personal Information & District Preference</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">Full Doctor Name (With Prefix) *</label>
+              <input 
+                type="text" 
+                id="doc-reg-name" 
+                required 
+                placeholder="e.g. Dr. K. Anbarasan"
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-semibold focus:outline-none focus:border-emerald-500 transition-all"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">Email Address *</label>
+              <input 
+                type="email" 
+                id="doc-reg-email" 
+                required 
+                placeholder="e.g. dr.anbarasan@gmail.com"
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-semibold focus:outline-none focus:border-emerald-500 transition-all"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">Contact Phone Number *</label>
+              <input 
+                type="tel" 
+                id="doc-reg-phone" 
+                required 
+                placeholder="e.g. +91 98402 12345"
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-semibold focus:outline-none focus:border-emerald-500 transition-all"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">Preferred Tamil Nadu District Posting *</label>
+              <select 
+                id="doc-reg-district" 
+                required 
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-semibold focus:outline-none focus:border-emerald-500 transition-all"
+              >
+                <option value="">-- Choose 38 TN District --</option>
+                <option value="Ariyalur">Ariyalur</option>
+                <option value="Chengalpattu">Chengalpattu</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Coimbatore">Coimbatore</option>
+                <option value="Cuddalore">Cuddalore</option>
+                <option value="Dharmapuri">Dharmapuri</option>
+                <option value="Dindigul">Dindigul</option>
+                <option value="Erode">Erode</option>
+                <option value="Kallakurichi">Kallakurichi</option>
+                <option value="Kancheepuram">Kancheepuram</option>
+                <option value="Kanyakumari">Kanyakumari</option>
+                <option value="Karur">Karur</option>
+                <option value="Krishnagiri">Krishnagiri</option>
+                <option value="Madurai">Madurai</option>
+                <option value="Mayiladuthurai">Mayiladuthurai</option>
+                <option value="Nagapattinam">Nagapattinam</option>
+                <option value="Namakkal">Namakkal</option>
+                <option value="Nilgiris">Nilgiris</option>
+                <option value="Perambalur">Perambalur</option>
+                <option value="Pudukkottai">Pudukkottai</option>
+                <option value="Ramanathapuram">Ramanathapuram</option>
+                <option value="Ranipet">Ranipet</option>
+                <option value="Salem">Salem</option>
+                <option value="Sivaganga">Sivaganga</option>
+                <option value="Tenkasi">Tenkasi</option>
+                <option value="Thanjavur">Thanjavur</option>
+                <option value="Theni">Theni</option>
+                <option value="Thoothukudi">Thoothukudi</option>
+                <option value="Tiruchirappalli">Tiruchirappalli</option>
+                <option value="Tirunelveli">Tirunelveli</option>
+                <option value="Tirupathur">Tirupathur</option>
+                <option value="Tiruppur">Tiruppur</option>
+                <option value="Tiruvallur">Tiruvallur</option>
+                <option value="Tiruvannamalai">Tiruvannamalai</option>
+                <option value="Tiruvarur">Tiruvarur</option>
+                <option value="Vellore">Vellore</option>
+                <option value="Viluppuram">Viluppuram</option>
+                <option value="Virudhunagar">Virudhunagar</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: PROFESSIONAL CREDENTIALS -->
+        <div>
+          <div class="flex items-center gap-2 border-b border-theme pb-3 mb-5">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm">2</div>
+            <h2 class="text-base font-extrabold text-main">Medical Credentials & Employment Status</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">ABDM Healthcare Professional ID (HPR ID) *</label>
+              <input 
+                type="text" 
+                id="doc-reg-hpr" 
+                required 
+                placeholder="e.g. HPR_18492"
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-mono focus:outline-none focus:border-emerald-500 transition-all uppercase"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">TN State Medical Council Registration No *</label>
+              <input 
+                type="text" 
+                id="doc-reg-council" 
+                required 
+                placeholder="e.g. TNMC/2021/84920"
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-mono focus:outline-none focus:border-emerald-500 transition-all uppercase"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">Highest Medical Qualification *</label>
+              <select 
+                id="doc-reg-qual" 
+                required 
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-semibold focus:outline-none focus:border-emerald-500 transition-all"
+              >
+                <option value="MBBS">MBBS (Bachelor of Medicine)</option>
+                <option value="MD Gen Medicine">MD General Medicine</option>
+                <option value="MD Cardiology">MD Cardiology</option>
+                <option value="MS Orthopedics">MS Orthopedics</option>
+                <option value="MS Obstetrics">MS Obstetrics & Gynecology</option>
+                <option value="DM Neurology">DM Neurology</option>
+                <option value="MCh Cardiothoracic">MCh Cardiothoracic</option>
+                <option value="DNB General Surgery">DNB General Surgery</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">Specialization / Department *</label>
+              <select 
+                id="doc-reg-dept" 
+                required 
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-semibold focus:outline-none focus:border-emerald-500 transition-all"
+              >
+                <option value="Cardiology">Cardiology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="General Medicine">General Medicine</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Gynecology">Gynecology</option>
+                <option value="Emergency Care">Emergency Care</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider mb-2">Current Employment Status *</label>
+              <select 
+                id="doc-reg-status" 
+                required 
+                class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main font-semibold focus:outline-none focus:border-emerald-500 transition-all"
+              >
+                <option value="Unemployed / Seeking Posting">Unemployed / Seeking Govt Hospital Posting</option>
+                <option value="Locum / Temporary">Locum / Temporary Substitute Clinician</option>
+                <option value="Private Practitioner Seeking Public Panel">Private Practitioner Seeking Public OPD Panel</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: DOCUMENT UPLOADS WITH PREVIEWS -->
+        <div>
+          <div class="flex items-center gap-2 border-b border-theme pb-3 mb-5">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">3</div>
+            <h2 class="text-base font-extrabold text-main">Scanned Certificate & Identity Verification Uploads</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- DEGREE CERTIFICATE -->
+            <div class="bg-input/50 border border-theme rounded-2xl p-4 text-center space-y-3">
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider">Scanned Degree Certificate (PDF / Image) *</label>
+              <input type="file" id="file-degree" accept="image/*,.pdf" onchange="previewUpload(event, 'preview-degree')" class="hidden" />
+              <button type="button" onclick="document.getElementById('file-degree').click()" class="w-full py-3 px-4 rounded-xl border border-dashed border-emerald-500/50 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+                <span>Choose Degree Certificate File</span>
+              </button>
+              <div id="preview-degree" class="text-xs text-muted font-semibold truncate italic">No file selected yet</div>
+            </div>
+
+            <!-- MEDICAL COUNCIL CERTIFICATE -->
+            <div class="bg-input/50 border border-theme rounded-2xl p-4 text-center space-y-3">
+              <label class="block text-xs font-extrabold text-muted uppercase tracking-wider">Medical Council Registration Certificate *</label>
+              <input type="file" id="file-council" accept="image/*,.pdf" onchange="previewUpload(event, 'preview-council')" class="hidden" />
+              <button type="button" onclick="document.getElementById('file-council').click()" class="w-full py-3 px-4 rounded-xl border border-dashed border-blue-500/50 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 text-xs font-bold transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-contract text-base"></i>
+                <span>Choose TNMC Council Certificate</span>
+              </button>
+              <div id="preview-council" class="text-xs text-muted font-semibold truncate italic">No file selected yet</div>
+            </div>
+
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-4 rounded-2xl shadow-xl transition-all text-sm tracking-wide flex items-center justify-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Submit Verification Application to District Officer</span>
+        </button>
+
+      </form>
+
+    </div>
+
+    <!-- SUCCESS CONFIRMATION CONTAINER (HIDDEN INITIALLY) -->
+    <div id="success-confirmation" class="hidden bg-card border border-emerald-500/40 rounded-3xl p-8 md:p-12 text-center shadow-2xl anti-gravity-card space-y-4">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl mx-auto border border-emerald-500/30">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h2 class="text-2xl font-extrabold text-main">Application Submitted Successfully!</h2>
+      <p class="text-xs md:text-sm text-muted max-w-lg mx-auto">
+        Your registration credentials & uploaded certificates have been routed to the <strong id="success-district" class="text-emerald-400">District Health Officer Desk</strong> for verification.
+      </p>
+      
+      <div class="bg-input/60 border border-theme rounded-2xl p-4 max-w-md mx-auto text-left text-xs space-y-2">
+        <div class="flex items-center justify-between"><span class="text-muted">Application ID:</span><span id="success-app-id" class="font-mono text-emerald-400 font-bold">APP_1028</span></div>
+        <div class="flex items-center justify-between"><span class="text-muted">Applicant:</span><span id="success-name" class="font-bold text-main">Dr. Name</span></div>
+        <div class="flex items-center justify-between"><span class="text-muted">Verification Status:</span><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30">🟡 PENDING_VERIFICATION</span></div>
+      </div>
+
+      <div class="pt-4 flex items-center justify-center gap-3">
+        <a href="doctors.html" class="bg-input hover:bg-card text-main font-bold text-xs px-5 py-3 rounded-xl border border-theme transition-all">
+          View Active Doctor Directory
+        </a>
+        <a href="index.html" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-5 py-3 rounded-xl transition-all">
+          Return to Public Index
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-theme py-6 px-4 bg-card text-center text-xs text-muted">
+    <p>MedPulse TN — Practitioner Registration & Onboarding Portal</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    function previewUpload(event, targetId) {
+      const input = event.target;
+      const preview = document.getElementById(targetId);
+      if (input.files && input.files[0]) {
+        preview.textContent = '✓ Uploaded: ' + input.files[0].name;
+        preview.className = 'text-xs text-emerald-400 font-bold truncate';
+      }
+    }
+  </script>
+</body>
+</html>

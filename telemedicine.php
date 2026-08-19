@@ -1,0 +1,341 @@
+<?php
+include 'db_connect.php';
+
+// List of all 38 Districts in Tamil Nadu
+$tamilnadu_districts = [
+    "Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", 
+    "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kancheepuram", 
+    "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", 
+    "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", 
+    "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", 
+    "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", 
+    "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", 
+    "Vellore", "Viluppuram", "Virudhunagar"
+];
+?>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eSanjeevani Telemedicine Portal – MedPulse TN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- ANTI-GRAVITY GLASSMORPHIC PRELOADER -->
+  <div id="app-preloader">
+    <div class="floating-logo flex flex-col items-center gap-3">
+      <div class="w-16 h-16 rounded-2xl bg-blue-500/20 border-2 border-blue-500/40 flex items-center justify-center font-extrabold text-blue-400 text-2xl shadow-2xl">
+        <i class="fa-solid fa-video"></i>
+      </div>
+      <span class="text-xl font-extrabold text-main tracking-tight">MedPulse<span class="text-blue-400">.Telemed</span></span>
+      <span class="text-xs text-muted font-mono tracking-widest uppercase animate-pulse">Connecting eSanjeevani Gateway...</span>
+    </div>
+  </div>
+
+  <!-- TOP HEADER NAVBAR -->
+  <nav class="sticky top-0 z-40 border-b border-theme bg-card px-4 md:px-8 py-3.5 shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <a href="index.php" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center font-extrabold text-blue-400 text-lg">
+          <i class="fa-solid fa-laptop-medical"></i>
+        </div>
+        <div>
+          <span class="text-lg font-extrabold tracking-tight text-main">MedPulse<span class="text-blue-400">.Telemed</span></span>
+          <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full font-bold ml-1.5 border border-blue-500/20">eSANJEEVANI GATEWAY</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2.5">
+        <a href="map.php" title="Emergency Map" class="w-9 h-9 icon-btn-reactive text-sm flex items-center justify-center">
+          <i class="fa-solid fa-map-location-dot"></i>
+        </a>
+
+        <button onclick="toggleTheme()" title="Toggle Light/Dark Theme" class="w-9 h-9 icon-btn-reactive text-sm flex items-center justify-center">
+          <span class="theme-icon-symbol"><i class="fa-solid fa-moon"></i></span>
+        </button>
+
+        <button onclick="openSidebar()" title="Open Menu Drawer" class="w-9 h-9 icon-btn-reactive text-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- RIGHT SLIDING SIDEBAR DRAWER (☰) -->
+  <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9990] hidden transition-opacity duration-300"></div>
+
+  <aside id="sidebar" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-card border-l border-theme z-[9999] transform translate-x-full transition-transform duration-300 p-6 flex flex-col justify-between shadow-2xl overflow-y-auto">
+    <div>
+      <div class="flex items-center justify-between border-b border-theme pb-4 mb-6">
+        <h3 class="font-extrabold text-base text-main tracking-tight">MedPulse TN Menu</h3>
+        <button onclick="closeSidebar()" class="p-1 rounded-lg text-muted hover:text-main">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <p class="text-[11px] font-extrabold uppercase text-emerald-400 tracking-wider mb-2">🌐 Navigation</p>
+          <div class="space-y-1 text-sm font-semibold">
+            <a href="index.php" class="drawer-item">Home Dashboard</a>
+            <a href="queue.php" class="drawer-item">Live OPD Queue Status</a>
+            <a href="telemedicine.php" class="drawer-item drawer-item-active">Telemedicine Portal</a>
+            <a href="hpr.php" class="drawer-item">About HPR Verification</a>
+            <a href="doctor_register.php" class="drawer-item">👨‍⚕️ Doctor Onboarding Portal</a>
+            <a href="login.php" class="drawer-item">Admin & Staff Portal</a>
+            <a href="hospitals.php" class="drawer-item">Hospital Directory</a>
+            <a href="blood_bank.php" class="drawer-item">Blood Bank Stocks</a>
+            <a href="map.php" class="drawer-item">Live Interactive Map</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 md:px-8 py-8 w-full flex-grow">
+
+    <!-- HERO BANNER -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-3">
+          <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+          National Telemedicine Service (eSanjeevani OPD Integration)
+        </div>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-main tracking-tight">eSanjeevani Teleconsultation Gateway</h1>
+        <p class="text-xs md:text-sm text-muted mt-1.5 max-w-2xl">
+          Connect directly with Government Medical College specialists across Tamil Nadu via video consultation. Get digital ePrescriptions and instant lab reports delivered directly to your ABHA profile.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-3">
+        <button onclick="openTelemedBookingModal()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs md:text-sm px-5 py-3 rounded-2xl shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2.5 whitespace-nowrap">
+          <i class="fa-solid fa-video text-base"></i>
+          <span>Book Virtual Consultation</span>
+        </button>
+        <a href="https://esanjeevani.mohfw.gov.in/" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs md:text-sm px-5 py-3 rounded-2xl shadow-xl shadow-emerald-500/25 transition-all flex items-center justify-center gap-2.5 whitespace-nowrap">
+          <i class="fa-solid fa-globe text-base"></i>
+          <span>Open Official eSanjeevani Portal ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- FEATURE HIGHLIGHT CARDS (2 COLUMNS) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+      <!-- FEATURE CARD 1: eSANJEEVANI AB-HWC HUB-AND-SPOKE -->
+      <div class="bg-card border border-theme rounded-3xl p-6 shadow-xl anti-gravity-card relative overflow-hidden flex flex-col justify-between">
+        <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 text-2xl font-bold shrink-0">
+            <i class="fa-solid fa-network-wired"></i>
+          </div>
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-bold mb-1 border border-blue-500/20">
+              NATIONAL HEALTH AUTHORITY
+            </div>
+            <h3 class="font-extrabold text-main text-lg">eSanjeevani AB-HWC Hub-and-Spoke Model</h3>
+            <p class="text-xs text-muted mt-1 leading-relaxed">
+              Connects Ayushman Bharat Health & Wellness Clinics (HWC) in rural transit corridors with tertiary medical college hospitals like RGGGH Chennai, CMCH Coimbatore, and GRH Madurai.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-theme flex items-center justify-between text-xs">
+          <span class="text-emerald-400 font-bold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> ABDM Compliant</span>
+          <span class="text-muted">Free Govt Service</span>
+        </div>
+      </div>
+
+      <!-- FEATURE CARD 2: INSTANT WHATSAPP PRESCRIPTIONS VIA NALAM AI -->
+      <div class="bg-card border border-theme rounded-3xl p-6 shadow-xl anti-gravity-card relative overflow-hidden flex flex-col justify-between">
+        <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl font-bold shrink-0">
+            <i class="fa-solid fa-message"></i>
+          </div>
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold mb-1 border border-emerald-500/20">
+              NALAM AI TELEMETRY
+            </div>
+            <h3 class="font-extrabold text-main text-lg">Instant WhatsApp Prescriptions via Nalam AI</h3>
+            <p class="text-xs text-muted mt-1 leading-relaxed">
+              Receive digital prescriptions signed by registered doctors directly on WhatsApp immediately following your tele-consultation call.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-theme flex items-center justify-between text-xs">
+          <span class="text-blue-400 font-bold flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp Bot Integrated</span>
+          <span class="text-muted">Instant Dispatch</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABBED CONTENT: VIRTUAL DOCTOR DIRECTORY & DIGITAL PRESCRIPTION VIEWER -->
+    <div class="space-y-6">
+      
+      <div class="flex items-center justify-between border-b border-theme pb-3">
+        <h2 class="text-xl font-extrabold text-main">Virtual OPD Doctor Directory</h2>
+        <button onclick="togglePrescriptionViewer()" class="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1.5 bg-blue-500/10 px-3 py-1.5 rounded-xl border border-blue-500/20 transition-all">
+          <i class="fa-solid fa-file-medical"></i>
+          <span>Sample ePrescription Viewer</span>
+        </button>
+      </div>
+
+      <!-- DIGITAL E-PRESCRIPTION VIEWER UI WIDGET (TOGGLEABLE) -->
+      <div id="eprescription-viewer" class="hidden bg-card border border-theme rounded-3xl p-6 shadow-2xl anti-gravity-card transition-all">
+        <div class="flex items-center justify-between border-b border-theme pb-4 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg">
+              <i class="fa-solid fa-file-prescription"></i>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-main text-sm">Sample ABDM Compliant ePrescription</h3>
+              <p class="text-xs text-muted">eSanjeevani OPD Telemedicine Record #EP-TN-89412</p>
+            </div>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+            VERIFIED E-SIGNATURE
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+          <!-- PATIENT & DOCTOR METADATA -->
+          <div class="space-y-3 bg-input/50 p-4 rounded-2xl border border-theme">
+            <div>
+              <span class="text-muted block text-[10px] uppercase font-bold">PATIENT DETAILS</span>
+              <span class="font-bold text-main text-sm">S. Rajendran (Male, 48 yrs)</span>
+              <span class="block text-muted text-[11px]">ABHA Address: rajendran.s@abdm</span>
+            </div>
+            <div>
+              <span class="text-muted block text-[10px] uppercase font-bold">CONSULTING SPECIALIST</span>
+              <span class="font-bold text-main">Dr. K. Senthil Nathan (MD, DM Cardiology)</span>
+              <span class="block text-emerald-400 font-semibold text-[11px]">Rajiv Gandhi Govt General Hospital (RGGGH)</span>
+            </div>
+          </div>
+
+          <!-- MEDICATIONS PRESCRIBED -->
+          <div class="space-y-3 bg-input/50 p-4 rounded-2xl border border-theme">
+            <span class="text-muted block text-[10px] uppercase font-bold">PRESCRIBED MEDICATIONS</span>
+            <ul class="space-y-2 font-mono text-[11px] text-main">
+              <li class="flex items-center justify-between border-b border-theme/50 pb-1">
+                <span>Tab. Telmisartan 40mg</span>
+                <span class="text-blue-400 font-bold">1 - 0 - 0 (Morning)</span>
+              </li>
+              <li class="flex items-center justify-between border-b border-theme/50 pb-1">
+                <span>Tab. Atorvastatin 10mg</span>
+                <span class="text-blue-400 font-bold">0 - 0 - 1 (Night)</span>
+              </li>
+              <li class="flex items-center justify-between">
+                <span>Tab. Aspirin 75mg</span>
+                <span class="text-blue-400 font-bold">1 - 0 - 0 (After Food)</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-theme flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <span class="text-muted">Diagnostic Order: <b>ECG 12-Lead & Lipid Profile Test</b></span>
+          <button onclick="alert('✓ Sample ePrescription PDF downloaded successfully!')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl transition-all flex items-center gap-2">
+            <i class="fa-solid fa-download"></i> Download Sample ePrescription PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- VIRTUAL DOCTORS GRID -->
+      <div id="telemed-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Populated dynamically by app.js -->
+      </div>
+    </div>
+  </main>
+
+  <!-- 3-STEP VIRTUAL SLOT BOOKING MODAL -->
+  <div id="telemed-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-[10000] hidden flex items-center justify-center p-4">
+    <div class="bg-card border border-theme rounded-3xl p-6 max-w-lg w-full shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeTelemedBookingModal()" class="absolute top-5 right-5 text-muted hover:text-main text-xl font-bold leading-none p-1">✕</button>
+      
+      <div class="flex items-center gap-3 border-b border-theme pb-4 mb-5">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-video"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-extrabold text-main">eSanjeevani 3-Step Teleconsultation Booking</h3>
+          <p class="text-xs text-muted">Schedule virtual video session with government specialists</p>
+        </div>
+      </div>
+
+      <form onsubmit="submitTelemedBooking(event)" class="space-y-4 text-xs">
+        
+        <!-- STEP 1: SELECT SPECIALTY -->
+        <div>
+          <label class="block font-bold text-muted uppercase mb-1">Step 1: Medical Department Wing *</label>
+          <select id="telemed-dept" required class="w-full bg-input border border-theme rounded-xl px-3.5 py-2.5 text-main focus:outline-none focus:border-blue-500">
+            <option value="Cardiology">Cardiology & Hypertension</option>
+            <option value="Neurology">Neurology & Stroke Care</option>
+            <option value="General Medicine">General Medicine & Diabetology</option>
+            <option value="Orthopedics">Orthopedics & Joint Care</option>
+            <option value="Pediatrics">Pediatrics & Child Care</option>
+          </select>
+        </div>
+
+        <!-- STEP 2: CHOOSE DOCTOR & TIME SLOT -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-muted uppercase mb-1">Step 2: Preferred Date *</label>
+            <input type="date" id="telemed-date" required class="w-full bg-input border border-theme rounded-xl px-3.5 py-2.5 text-main focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-muted uppercase mb-1">Time Slot *</label>
+            <select id="telemed-slot-time" required class="w-full bg-input border border-theme rounded-xl px-3 py-2.5 text-main focus:outline-none focus:border-blue-500">
+              <option value="10:00 AM - 10:30 AM">10:00 AM - 10:30 AM</option>
+              <option value="11:30 AM - 12:00 PM">11:30 AM - 12:00 PM</option>
+              <option value="03:00 PM - 03:30 PM">03:00 PM - 03:30 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- STEP 3: PATIENT MOBILE & ABHA ID -->
+        <div>
+          <label class="block font-bold text-muted uppercase mb-1">Step 3: Patient Full Name *</label>
+          <input type="text" id="telemed-name" required class="w-full bg-input border border-theme rounded-xl px-3.5 py-2.5 text-main focus:outline-none focus:border-blue-500" placeholder="e.g. S. Meenakshi">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-muted uppercase mb-1">Mobile Number *</label>
+            <input type="tel" id="telemed-phone" required pattern="[0-9]{10}" class="w-full bg-input border border-theme rounded-xl px-3.5 py-2.5 text-main focus:outline-none focus:border-blue-500" placeholder="10-digit mobile">
+          </div>
+          <div>
+            <label class="block font-bold text-muted uppercase mb-1">ABHA Address (Optional)</label>
+            <input type="text" id="telemed-abha" class="w-full bg-input border border-theme rounded-xl px-3.5 py-2.5 text-main focus:outline-none focus:border-blue-500" placeholder="patient@abdm">
+          </div>
+        </div>
+
+        <div class="pt-2 flex flex-col gap-2">
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-video"></i>
+            <span>Confirm Tele-consultation Appointment</span>
+          </button>
+          <a href="https://esanjeevani.mohfw.gov.in/" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-500/15 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/30 font-extrabold text-xs py-2.5 rounded-xl transition-all text-center flex items-center justify-center gap-2">
+            <i class="fa-solid fa-globe"></i>
+            <span>Or Open Official eSanjeevani Web Portal ↗</span>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-theme py-6 px-4 md:px-8 bg-card text-center text-xs text-muted">
+    <p>MedPulse TN — eSanjeevani National Telemedicine Integration</p>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

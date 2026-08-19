@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedPulse TN – Nurse Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between">
+
+  <!-- ANTI-GRAVITY GLASSMORPHIC PRELOADER -->
+  <div id="app-preloader">
+    <div class="floating-logo flex flex-col items-center gap-3">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center font-extrabold text-emerald-400 text-2xl shadow-2xl">
+        M
+      </div>
+      <span class="text-xl font-extrabold text-main tracking-tight">MedPulse<span class="text-emerald-400">.TN</span></span>
+      <span class="text-xs text-muted font-mono tracking-widest uppercase animate-pulse">Initializing Live Infrastructure...</span>
+    </div>
+  </div>
+
+  <div class="max-w-3xl mx-auto w-full">
+    
+    <div class="flex items-center justify-between border-b border-theme pb-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-emerald-400">Nurse Proxy Control</h1>
+        <p class="text-xs text-muted mt-0.5">Authorized OPD Desk Management</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTheme()" class="p-2 rounded-xl border border-theme bg-input text-main">
+          <span class="theme-icon-symbol">🌙</span>
+        </button>
+        <a href="index.html" class="text-xs bg-input hover:bg-card text-main px-3 py-2 rounded-xl border border-theme">
+          ← Portal Overview
+        </a>
+      </div>
+    </div>
+
+    <div class="bg-card border border-theme rounded-2xl p-6 shadow-xl mb-6 anti-gravity-card">
+      <label class="block text-xs font-semibold text-muted uppercase mb-2">Select Doctor</label>
+      <select id="doctor-select" class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main focus:outline-none" onchange="loadDoctorData()">
+        <option value="">-- Choose Doctor in your OPD Wing --</option>
+        <option value="D1001">Dr. K. Raman (Chennai - Cardiology - Cabin 1)</option>
+        <option value="D1002">Dr. S. Meenakshi (Chennai - Neurology - Cabin 2)</option>
+        <option value="D1007">Dr. P. Vijayakumar (Salem - Cardiology - Cabin 1)</option>
+        <option value="D1013">Dr. M. Sundar (Coimbatore - Cardiology - Cabin 1)</option>
+        <option value="D1019">Dr. R. Anitha (Madurai - Cardiology - Cabin 1)</option>
+        <option value="">-- Choose Doctor in your OPD Wing --</option>
+        <option value="D1001">Dr. S. Raman (Chennai - Cardiology - Cabin 1)</option>
+        <option value="D1002">Dr. P. Meenakshi (Chennai - Neurology - Cabin 2)</option>
+        <option value="D1007">Dr. M. Vijayakumar (Salem - Cardiology - Cabin 1)</option>
+        <option value="D1013">Dr. R. Sundar (Coimbatore - Cardiology - Cabin 1)</option>
+        <option value="D1019">Dr. T. Anitha (Madurai - Cardiology - Cabin 1)</option>
+      </select>
+    </div>
+
+    <div id="update-panel" class="bg-card border border-theme rounded-2xl p-6 shadow-xl hidden anti-gravity-card">
+      <div class="flex items-center justify-between border-b border-theme pb-4 mb-6">
+        <div>
+          <h2 id="selected-doc-name" class="text-lg font-bold text-main">Dr. K. Raman</h2>
+          <p id="selected-doc-cabin" class="text-xs text-muted">Cabin 1, Block A · Chennai</p>
+        </div>
+        <span id="current-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          IN CABIN
+        </span>
+      </div>
+
+      <label class="block text-xs font-semibold text-muted uppercase mb-3">Update Presence</label>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <button onclick="setStatus('in')" class="py-3 px-4 rounded-xl text-xs font-bold border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-center">
+          IN CABIN
+        </button>
+        <button onclick="setStatus('emr')" class="py-3 px-4 rounded-xl text-xs font-bold border border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 text-center">
+          EMERGENCY / OT
+        </button>
+        <button onclick="setStatus('off')" class="py-3 px-4 rounded-xl text-xs font-bold border border-red-500/40 bg-red-500/10 text-red-400 hover:bg-red-500/20 text-center">
+          OFF DUTY
+        </button>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-xs font-semibold text-muted uppercase mb-2">Broadcasting Note (Optional)</label>
+        <input type="text" id="status-reason" placeholder="e.g. In Emergency OT Ward until 11:30 AM" 
+          class="w-full bg-input border border-theme rounded-xl px-4 py-3 text-sm text-main focus:outline-none" />
+      </div>
+
+      <button onclick="saveDoctorStatus()" class="w-full bg-emerald-500 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg hover:brightness-110 text-sm">
+        Broadcast Status Change
+      </button>
+
+      <p id="save-msg" class="text-xs text-emerald-400 text-center mt-3 hidden">✓ Status updated and synced with Patient Directory!</p>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    let activeStatus = 'in';
+
+    function loadDoctorData() {
+      const select = document.getElementById('doctor-select');
+      const docId = select ? select.value : '';
+      const panel = document.getElementById('update-panel');
+      if (!panel) return;
+
+      if (!docId) {
+        panel.classList.add('hidden');
+        return;
+      }
+      panel.classList.remove('hidden');
+
+      const savedUpdates = JSON.parse(localStorage.getItem('medpulse_status_updates') || '{}');
+      const savedData = savedUpdates[docId];
+
+      const reasonEl = document.getElementById('status-reason');
+
+      if (savedData) {
+        setStatus(savedData.status);
+        if (reasonEl) reasonEl.value = savedData.reason || '';
+      } else {
+        setStatus('in');
+        if (reasonEl) reasonEl.value = '';
+      }
+    }
+
+    function setStatus(status) {
+      activeStatus = status;
+      const badge = document.getElementById('current-status-badge');
+      if (!badge) return;
+
+      if (status === 'in') {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        badge.textContent = 'IN CABIN';
+      } else if (status === 'emr') {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30';
+        badge.textContent = 'IN EMERGENCY / OT';
+      } else {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30';
+        badge.textContent = 'OFF DUTY';
+      }
+    }
+
+    function saveDoctorStatus() {
+      const select = document.getElementById('doctor-select');
+      const docId = select ? select.value : '';
+      const reasonEl = document.getElementById('status-reason');
+      const reason = reasonEl ? reasonEl.value : '';
+
+      if (!docId) return;
+
+      const savedUpdates = JSON.parse(localStorage.getItem('medpulse_status_updates') || '{}');
+
+      savedUpdates[docId] = {
+        status: activeStatus,
+        reason: reason,
+        lastPunch: 'Just now'
+      };
+
+      localStorage.setItem('medpulse_status_updates', JSON.stringify(savedUpdates));
+
+      const msg = document.getElementById('save-msg');
+      if (msg) {
+        msg.classList.remove('hidden');
+        setTimeout(() => msg.classList.add('hidden'), 3000);
+      }
+    }
+  </script>
+</body>
+</html>
