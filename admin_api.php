@@ -96,6 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $note = trim($input['note'] ?? '');
             $lat = !empty($input['lat']) ? floatval($input['lat']) : null;
             $lon = !empty($input['lon']) ? floatval($input['lon']) : null;
+            $opd_start_time = !empty($input['opd_start_time']) ? trim($input['opd_start_time']) : (!empty($input['opdStartTime']) ? trim($input['opdStartTime']) : null);
+            $opd_end_time = !empty($input['opd_end_time']) ? trim($input['opd_end_time']) : (!empty($input['opdEndTime']) ? trim($input['opdEndTime']) : null);
 
             if (empty($doc_code) || empty($doctor_name) || empty($district)) {
                 $response = ['success' => false, 'message' => 'Doctor Code, Name, and District are required.'];
@@ -104,12 +106,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!empty($id)) {
                 // Update
-                $stmt = $conn->prepare("UPDATE doctors SET doc_code = ?, hpr_id = ?, doctor_name = ?, qualification = ?, department = ?, hospital_name = ?, district = ?, cabin = ?, status = ?, note = ?, lat = ?, lon = ? WHERE id = ?");
-                $stmt->bind_param("ssssssssssddi", $doc_code, $hpr_id, $doctor_name, $qualification, $department, $hospital_name, $district, $cabin, $status, $note, $lat, $lon, $id);
+                $stmt = $conn->prepare("UPDATE doctors SET doc_code = ?, hpr_id = ?, doctor_name = ?, qualification = ?, department = ?, hospital_name = ?, district = ?, cabin = ?, status = ?, note = ?, lat = ?, lon = ?, opd_start_time = ?, opd_end_time = ? WHERE id = ?");
+                $stmt->bind_param("ssssssssssddssi", $doc_code, $hpr_id, $doctor_name, $qualification, $department, $hospital_name, $district, $cabin, $status, $note, $lat, $lon, $opd_start_time, $opd_end_time, $id);
             } else {
                 // Insert
-                $stmt = $conn->prepare("INSERT INTO doctors (doc_code, hpr_id, doctor_name, qualification, department, hospital_name, district, cabin, status, note, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssssssssssdd", $doc_code, $hpr_id, $doctor_name, $qualification, $department, $hospital_name, $district, $cabin, $status, $note, $lat, $lon);
+                $stmt = $conn->prepare("INSERT INTO doctors (doc_code, hpr_id, doctor_name, qualification, department, hospital_name, district, cabin, status, note, lat, lon, opd_start_time, opd_end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssssssssddss", $doc_code, $hpr_id, $doctor_name, $qualification, $department, $hospital_name, $district, $cabin, $status, $note, $lat, $lon, $opd_start_time, $opd_end_time);
             }
 
             if ($stmt->execute()) {

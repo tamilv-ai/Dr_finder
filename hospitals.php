@@ -128,6 +128,10 @@ if (empty($hospitals_list) && !$db_connected) {
       </a>
 
       <div class="flex items-center gap-2.5">
+        <button onclick="openPatientTokensModal()" title="My Saved OP Tokens" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-ticket"></i>
+          <span>My Tokens</span>
+        </button>
         <a href="index.php" class="text-xs font-semibold text-muted hover:text-emerald-400 px-3 py-1.5">Home</a>
         <a href="blood_bank.php" class="text-xs font-semibold text-muted hover:text-emerald-400 px-3 py-1.5">Blood Bank</a>
         <a href="map.php" title="Live Emergency GIS Map" class="w-9 h-9 icon-btn-reactive text-sm flex items-center justify-center">
@@ -224,9 +228,12 @@ if (empty($hospitals_list) && !$db_connected) {
               </div>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-theme">
-              <a href="map.php?dest=<?= urlencode($row['hospital_name']) ?>&lat=<?= $row['lat'] ?? '' ?>&lon=<?= $row['lon'] ?? '' ?>" class="w-full bg-input hover:bg-emerald-500 hover:text-slate-950 text-main font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs transition-all border border-theme">
-                <i class="fa-solid fa-diamond-turn-right"></i> Get Directions & Live Map
+            <div class="mt-4 pt-3 border-t border-theme grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button onclick="openHospitalDetailsModal('<?= htmlspecialchars($row['hospital_name'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($row['district'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($row['address'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($row['specialty'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($row['contact'] ?? '', ENT_QUOTES) ?>', '<?= $row['lat'] ?? '' ?>', '<?= $row['lon'] ?? '' ?>')" class="w-full bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all border border-emerald-500/30">
+                <i class="fa-solid fa-hospital"></i> Details & Doctors
+              </button>
+              <a href="map.php?search=<?= urlencode($row['hospital_name'] ?? '') ?>" class="w-full bg-input hover:bg-emerald-500 hover:text-slate-950 text-main font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all border border-theme">
+                <i class="fa-solid fa-diamond-turn-right"></i> Directions
               </a>
             </div>
           </div>

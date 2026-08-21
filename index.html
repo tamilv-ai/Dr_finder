@@ -35,6 +35,11 @@
       </a>
 
       <div class="flex items-center gap-2.5">
+        <button onclick="openPatientTokensModal()" title="My Saved OP Tokens" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-ticket"></i>
+          <span>My Tokens</span>
+        </button>
+
         <a href="map.html" title="Emergency Map" class="w-9 h-9 icon-btn-reactive text-sm flex items-center justify-center">
           <i class="fa-solid fa-map-location-dot"></i>
         </a>
@@ -89,6 +94,10 @@
             <button onclick="triggerService('appointment')" class="drawer-item">Book Appointment</button>
             <a href="queue.html" class="drawer-item">Live OPD Queue Status</a>
             <a href="telemedicine.html" class="drawer-item">Telemedicine Portal</a>
+            <button onclick="openPatientTokensModal()" class="drawer-item w-full text-left flex items-center justify-between text-emerald-400 font-bold">
+              <span>🎫 My Saved OP Tokens</span>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">SAVED</span>
+            </button>
           </div>
         </div>
 

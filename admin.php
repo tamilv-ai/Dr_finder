@@ -558,6 +558,17 @@ $tamilnadu_districts = [
 
         <div class="grid grid-cols-2 gap-3">
           <div>
+            <label class="block font-semibold text-muted uppercase mb-1">OPD Start Time</label>
+            <input type="time" id="doc-opd-start" class="w-full bg-input border border-theme rounded-xl px-3.5 py-2.5 text-main focus:outline-none" value="09:00">
+          </div>
+          <div>
+            <label class="block font-semibold text-muted uppercase mb-1">OPD End Time</label>
+            <input type="time" id="doc-opd-end" class="w-full bg-input border border-theme rounded-xl px-3.5 py-2.5 text-main focus:outline-none" value="13:00">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
             <label class="block font-semibold text-muted uppercase mb-1">Initial Presence Status</label>
             <select id="doc-status" class="w-full bg-input border border-theme rounded-xl px-3 py-2.5 text-main focus:outline-none">
               <option value="in">IN CABIN</option>
@@ -820,10 +831,9 @@ $tamilnadu_districts = [
       window.location.reload();
     }
 
-    // Doctor Modal Functions
     function openDoctorModal() {
-      document.getElementById('doc-id').value = '';
-      document.getElementById('doc-code').value = 'D' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('doc-id').value = 'D' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('doc-code').value = document.getElementById('doc-id').value;
       document.getElementById('doc-hpr').value = 'HPR_' + Math.floor(10000 + Math.random() * 90000);
       document.getElementById('doc-name').value = '';
       document.getElementById('doc-qual').value = '';
@@ -832,6 +842,8 @@ $tamilnadu_districts = [
       document.getElementById('doc-cabin').value = 'Cabin 1, Main Block';
       document.getElementById('doc-status').value = 'in';
       document.getElementById('doc-note').value = '';
+      if (document.getElementById('doc-opd-start')) document.getElementById('doc-opd-start').value = '09:00';
+      if (document.getElementById('doc-opd-end')) document.getElementById('doc-opd-end').value = '13:00';
       document.getElementById('doctor-modal-title').textContent = 'Add New Doctor';
       document.getElementById('doctor-modal').classList.remove('hidden');
     }
@@ -842,16 +854,18 @@ $tamilnadu_districts = [
 
     function editDoctor(d) {
       document.getElementById('doc-id').value = d.id || '';
-      document.getElementById('doc-code').value = d.doc_code || '';
-      document.getElementById('doc-hpr').value = d.hpr_id || '';
-      document.getElementById('doc-name').value = d.doctor_name || '';
-      document.getElementById('doc-qual').value = d.qualification || '';
-      document.getElementById('doc-dept').value = d.department || '';
-      document.getElementById('doc-hospital').value = d.hospital_name || '';
-      document.getElementById('doc-district').value = d.district || 'Chennai';
+      document.getElementById('doc-code').value = d.doc_code || d.id || '';
+      document.getElementById('doc-hpr').value = d.hpr_id || d.hpr || '';
+      document.getElementById('doc-name').value = d.doctor_name || d.name || '';
+      document.getElementById('doc-qual').value = d.qualification || d.qual || '';
+      document.getElementById('doc-dept').value = d.department || d.dept || '';
+      document.getElementById('doc-hospital').value = d.hospital_name || d.hospitalName || '';
+      document.getElementById('doc-district').value = d.district || d.districtName || 'Chennai';
       document.getElementById('doc-cabin').value = d.cabin || '';
       document.getElementById('doc-status').value = d.status || 'in';
       document.getElementById('doc-note').value = d.note || '';
+      if (document.getElementById('doc-opd-start')) document.getElementById('doc-opd-start').value = d.opd_start_time || d.opdStartTime || '09:00';
+      if (document.getElementById('doc-opd-end')) document.getElementById('doc-opd-end').value = d.opd_end_time || d.opdEndTime || '13:00';
       document.getElementById('doctor-modal-title').textContent = 'Edit Doctor Profile';
       document.getElementById('doctor-modal').classList.remove('hidden');
     }
@@ -870,7 +884,11 @@ $tamilnadu_districts = [
         district: document.getElementById('doc-district').value,
         cabin: document.getElementById('doc-cabin').value,
         status: document.getElementById('doc-status').value,
-        note: document.getElementById('doc-note').value
+        note: document.getElementById('doc-note').value,
+        opd_start_time: document.getElementById('doc-opd-start') ? document.getElementById('doc-opd-start').value : '09:00',
+        opd_end_time: document.getElementById('doc-opd-end') ? document.getElementById('doc-opd-end').value : '13:00',
+        opdStartTime: document.getElementById('doc-opd-start') ? document.getElementById('doc-opd-start').value : '09:00',
+        opdEndTime: document.getElementById('doc-opd-end') ? document.getElementById('doc-opd-end').value : '13:00'
       };
 
       const overrides = JSON.parse(localStorage.getItem('medpulse_doctors_override') || '[]');

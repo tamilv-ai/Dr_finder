@@ -230,6 +230,8 @@ DISTRICT_CONFIG.forEach(dist => {
         lastPunch: `${(globalIndex * 3) % 25 + 2} mins ago`,
         lat: dist.lat + (Math.sin(globalIndex) * 0.02),
         lng: dist.lng + (Math.cos(globalIndex) * 0.02),
+        opdStartTime: (globalIndex % 2 === 0) ? '09:00' : null,
+        opdEndTime: (globalIndex % 2 === 0) ? '13:00' : null,
         distKm: null
       });
     });
@@ -313,6 +315,8 @@ function syncNurseUpdates() {
         lastPunch: 'Just now',
         lat: d.lat || 13.0827,
         lng: d.lon || d.lng || 80.2707,
+        opdStartTime: d.opd_start_time || d.opdStartTime || null,
+        opdEndTime: d.opd_end_time || d.opdEndTime || null,
         distKm: null
       });
     }
@@ -496,6 +500,58 @@ function getStatusBadge(status) {
   }
 }
 
+/* ================= OPD TIMINGS & SHIFT CALCULATOR ================= */
+function formatOpdTiming(startTime, endTime) {
+  if (!startTime || !endTime || startTime === '' || endTime === '') {
+    return { text: 'OPD timing not available', isOpen: false, hasTiming: false };
+  }
+
+  function to12Hour(timeStr) {
+    if (!timeStr) return null;
+    const parts = timeStr.trim().split(':');
+    if (parts.length < 1) return null;
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1] ? parts[1].slice(0, 2) : '00';
+    if (isNaN(hours)) return null;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const formattedHours = hours < 10 ? `0${hours}` : `${hours}`;
+    return `${formattedHours}:${minutes} ${ampm}`;
+  }
+
+  const startFormatted = to12Hour(startTime);
+  const endFormatted = to12Hour(endTime);
+
+  if (!startFormatted || !endFormatted) {
+    return { text: 'OPD timing not available', isOpen: false, hasTiming: false };
+  }
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const startParts = startTime.split(':');
+  const endParts = endTime.split(':');
+  const startMinutes = parseInt(startParts[0], 10) * 60 + parseInt(startParts[1] || 0, 10);
+  const endMinutes = parseInt(endParts[0], 10) * 60 + parseInt(endParts[1] || 0, 10);
+
+  let isOpen = false;
+  if (!isNaN(startMinutes) && !isNaN(endMinutes)) {
+    if (startMinutes <= endMinutes) {
+      isOpen = currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+    } else {
+      // Overnight shift handling (e.g. 20:00 to 04:00)
+      isOpen = currentMinutes >= startMinutes || currentMinutes <= endMinutes;
+    }
+  }
+
+  return {
+    text: `OPD: ${startFormatted} - ${endFormatted}`,
+    isOpen: isOpen,
+    hasTiming: true
+  };
+}
+
 function renderDoctorGrid() {
   const grid = document.getElementById('doctor-grid');
   const noRes = document.getElementById('no-results');
@@ -508,7 +564,10 @@ function renderDoctorGrid() {
   }
 
   if (noRes) noRes.classList.add('hidden');
-  grid.innerHTML = filteredDoctors.slice(0, 48).map(doc => `
+  grid.innerHTML = filteredDoctors.slice(0, 48).map(doc => {
+    const opdInfo = formatOpdTiming(doc.opdStartTime || doc.opd_start_time, doc.opdEndTime || doc.opd_end_time);
+    const opdBadgeClass = opdInfo.isOpen ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-slate-500/15 text-slate-400 border-slate-500/30';
+    return `
     <div class="bg-card border border-theme rounded-2xl p-5 hover:border-emerald-500/40 transition-all shadow-lg flex flex-col justify-between anti-gravity-card">
       <div>
         <div class="flex items-start justify-between gap-3 mb-3">
@@ -528,16 +587,17 @@ function renderDoctorGrid() {
           <div class="flex items-center gap-2"><span>🏥</span><span class="font-semibold text-main">${doc.hospitalName}</span></div>
           <div class="flex items-center gap-2"><span>📍</span><span>${doc.districtName} District</span></div>
           <div class="flex items-center gap-2"><span>🚪</span><span>${doc.cabin}</span></div>
+          <div class="flex items-center gap-2 text-emerald-400 font-semibold"><span>🕒</span><span>${opdInfo.text}</span></div>
           ${doc.note ? `<div class="text-[11px] text-amber-400 mt-1 bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">Note: ${doc.note}</div>` : ''}
         </div>
       </div>
 
       <div class="mt-4 pt-3 border-t border-theme flex items-center justify-between text-[11px] text-muted">
         <span>⏱ ${doc.lastPunch}</span>
-        <span class="text-emerald-400 font-semibold">Verified OPD</span>
+        ${opdInfo.hasTiming ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${opdBadgeClass}">${opdInfo.isOpen ? '🟢 OPD OPEN' : '⚪ OPD CLOSED'}</span>` : '<span class="text-muted text-[10px]">Verified OPD</span>'}
       </div>
     </div>
-  `).join('');
+  `}).join('');
 
   const countEl = document.getElementById('result-count');
   if (countEl) countEl.textContent = `Showing ${Math.min(48, filteredDoctors.length)} of ${filteredDoctors.length} doctors`;
@@ -546,16 +606,19 @@ function renderDoctorGrid() {
 function applyDoctorFilters() {
   const searchInput = document.getElementById('search-input');
   const distInput = document.getElementById('filter-district');
+  const specInput = document.getElementById('filter-specialty');
 
   const search = searchInput ? searchInput.value.toLowerCase() : '';
   const dist = distInput ? distInput.value : '';
+  const spec = specInput ? specInput.value.toLowerCase() : '';
 
   filteredDoctors = DOCTORS.filter(d => {
     const matchesSearch = d.name.toLowerCase().includes(search) || 
                           d.dept.toLowerCase().includes(search) || 
                           d.hospitalName.toLowerCase().includes(search);
     const matchesDist = !dist || d.district === dist;
-    return matchesSearch && matchesDist;
+    const matchesSpec = !spec || d.dept.toLowerCase() === spec;
+    return matchesSearch && matchesDist && matchesSpec;
   });
 
   renderDoctorGrid();
@@ -1061,13 +1124,35 @@ function renderQueueGrid() {
   }).join('');
 }
 
+/* ================= PATIENT OP TOKEN PERSISTENCE ENGINE ================= */
+function getPatientTokens() {
+  try {
+    return JSON.parse(localStorage.getItem('medpulse_patient_tokens') || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function savePatientToken(tokenData) {
+  if (!tokenData || typeof tokenData !== 'object') return false;
+  try {
+    const existing = getPatientTokens();
+    existing.unshift(tokenData);
+    localStorage.setItem('medpulse_patient_tokens', JSON.stringify(existing));
+    return true;
+  } catch (e) {
+    console.error('Failed to persist patient OP token:', e);
+    return false;
+  }
+}
+
 function openTokenModal(docId) {
   const modal = document.getElementById('token-modal');
   const docSelect = document.getElementById('token-doctor-select');
   if (!modal) return;
 
   if (docSelect && DOCTORS.length > 0) {
-    docSelect.innerHTML = DOCTORS.map(d => `<option value="${d.id}" ${docId === d.id ? 'selected' : ''}>${d.name} (${d.dept} - ${d.hospitalName})</option>`).join('');
+    docSelect.innerHTML = DOCTORS.map(d => `<option value="${d.id}" ${String(docId) === String(d.id) ? 'selected' : ''}>${d.name} (${d.dept} - ${d.hospitalName})</option>`).join('');
   }
 
   const resultWrapper = document.getElementById('generated-ticket-wrapper');
@@ -1084,10 +1169,11 @@ function closeTokenModal() {
 function generateOPToken(e) {
   e.preventDefault();
   const docSelect = document.getElementById('token-doctor-select');
-  const docId = parseInt(docSelect ? docSelect.value : '1');
-  const doctor = DOCTORS.find(d => d.id === docId) || DOCTORS[0];
+  const selectedVal = docSelect ? docSelect.value : '';
+  const doctor = DOCTORS.find(d => String(d.id) === String(selectedVal)) || DOCTORS[0];
 
   const tokenNum = Math.floor(Math.random() * 40) + 20;
+  const qrCodeStr = `TOKEN-TN-${doctor.hpr ? doctor.hpr.replace('HPR_', '') : '89412'}-${Date.now().toString().slice(-4)}`;
 
   const docNameEl = document.getElementById('ticket-doc-name');
   const hospNameEl = document.getElementById('ticket-hosp-name');
@@ -1097,10 +1183,175 @@ function generateOPToken(e) {
   if (docNameEl) docNameEl.textContent = `${doctor.name} (${doctor.qual})`;
   if (hospNameEl) hospNameEl.textContent = `${doctor.hospitalName}, ${doctor.cabin}`;
   if (ticketNumEl) ticketNumEl.textContent = `#${tokenNum}`;
-  if (qrCodeEl) qrCodeEl.textContent = `TOKEN-TN-${doctor.hpr.replace('HPR_', '')}-${Date.now().toString().slice(-4)}`;
+  if (qrCodeEl) qrCodeEl.textContent = qrCodeStr;
+
+  const patientName = document.getElementById('token-patient-name')?.value || 'Patient';
+  const patientPhone = document.getElementById('token-patient-phone')?.value || '';
+  const slot = document.getElementById('token-slot')?.value || '';
+  const notes = document.getElementById('token-notes')?.value || '';
+
+  const tokenData = {
+    id: `TK_${Date.now()}_${tokenNum}`,
+    tokenNumber: tokenNum,
+    docId: doctor.id,
+    doctorName: doctor.name,
+    qualification: doctor.qual,
+    department: doctor.dept,
+    hospitalName: doctor.hospitalName,
+    cabin: doctor.cabin,
+    district: doctor.districtName,
+    patientName: patientName,
+    patientPhone: patientPhone,
+    slot: slot,
+    notes: notes,
+    qrCode: qrCodeStr,
+    timestamp: new Date().toISOString(),
+    status: 'ACTIVE'
+  };
+
+  savePatientToken(tokenData);
 
   const resultWrapper = document.getElementById('generated-ticket-wrapper');
   if (resultWrapper) resultWrapper.classList.remove('hidden');
+
+  if (document.getElementById('patient-tokens-modal') && !document.getElementById('patient-tokens-modal').classList.contains('hidden')) {
+    renderPatientTokensList();
+  }
+}
+
+/* ================= MY SAVED PATIENT TOKENS MODAL & RENDERER ================= */
+function openPatientTokensModal() {
+  if (typeof closeSidebar === 'function') closeSidebar();
+  let modal = document.getElementById('patient-tokens-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'patient-tokens-modal';
+    modal.className = 'fixed inset-0 bg-black/75 backdrop-blur-sm z-[10000] flex items-center justify-center p-4';
+    modal.innerHTML = `
+      <div class="bg-card border border-theme rounded-3xl p-6 max-w-xl w-full shadow-2xl relative max-h-[90vh] flex flex-col justify-between">
+        <div class="flex items-center justify-between border-b border-theme pb-4 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg">
+              <i class="fa-solid fa-ticket"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-extrabold text-main">My Saved OP Tokens</h3>
+              <p class="text-xs text-muted">Active OPD tickets saved on this device</p>
+            </div>
+          </div>
+          <button onclick="closePatientTokensModal()" class="text-muted hover:text-main text-xl font-bold p-1">✕</button>
+        </div>
+
+        <div id="patient-tokens-container" class="space-y-4 overflow-y-auto max-h-[60vh] pr-1 flex-grow">
+        </div>
+
+        <div class="pt-4 border-t border-theme flex items-center justify-between mt-4">
+          <button onclick="clearPatientTokensHistory()" class="text-xs text-red-400 hover:text-red-300 font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20">
+            <i class="fa-solid fa-trash"></i> Clear History
+          </button>
+          <button onclick="closePatientTokensModal()" class="bg-emerald-500 text-slate-950 font-bold px-5 py-2 rounded-xl text-xs hover:brightness-110">
+            Close
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  renderPatientTokensList();
+  modal.classList.remove('hidden');
+}
+
+function closePatientTokensModal() {
+  const modal = document.getElementById('patient-tokens-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function clearPatientTokensHistory() {
+  if (confirm('Are you sure you want to clear all saved OP tokens from this device?')) {
+    localStorage.removeItem('medpulse_patient_tokens');
+    renderPatientTokensList();
+  }
+}
+
+function renderPatientTokensList() {
+  const container = document.getElementById('patient-tokens-container');
+  if (!container) return;
+
+  const tokens = getPatientTokens();
+
+  if (!Array.isArray(tokens) || tokens.length === 0) {
+    container.innerHTML = `
+      <div class="bg-input/60 border border-theme rounded-2xl p-8 text-center text-muted">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-xl mb-3 border border-emerald-500/20">
+          <i class="fa-solid fa-ticket"></i>
+        </div>
+        <h4 class="font-extrabold text-main text-sm mb-1">No OPD tokens found on this device</h4>
+        <p class="text-xs text-muted">Tokens generated from the Live OPD Queue status page will be saved here automatically.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = tokens.map(t => {
+    let formattedDate = 'Recently Issued';
+    if (t.timestamp) {
+      try {
+        formattedDate = new Date(t.timestamp).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      } catch (err) {}
+    }
+
+    const docName = t.doctorName || 'Doctor';
+    const qual = t.qualification ? ` (${t.qualification})` : '';
+    const hosp = t.hospitalName || 'Govt Hospital';
+    const cabinStr = t.cabin ? ` · ${t.cabin}` : '';
+    const tokenNo = t.tokenNumber ? `#${t.tokenNumber}` : '#--';
+    const patientName = t.patientName || 'Patient';
+    const phoneStr = t.patientPhone ? ` (${t.patientPhone})` : '';
+    const slotStr = t.slot || 'OPD Hours';
+    const qrStr = t.qrCode || `TOKEN-TN-${t.id || '2026'}`;
+    const notesStr = t.notes ? `<div class="text-[11px] text-amber-400 mt-2 bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">Notes: ${t.notes}</div>` : '';
+
+    return `
+      <div class="bg-card border border-emerald-500/30 rounded-2xl p-4 shadow-lg space-y-3 relative">
+        <div class="flex items-start justify-between gap-2 border-b border-theme pb-2.5">
+          <div>
+            <div class="flex items-center gap-2">
+              <h4 class="font-extrabold text-main text-sm">${docName}${qual}</h4>
+              <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 font-bold">${t.department || 'OPD'}</span>
+            </div>
+            <p class="text-xs text-muted mt-0.5">🏥 ${hosp}${cabinStr}</p>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            ${t.status || 'ACTIVE'}
+          </span>
+        </div>
+
+        <div class="bg-input/60 rounded-xl p-3 flex items-center justify-between text-xs border border-theme">
+          <div>
+            <span class="block text-[10px] text-muted font-bold uppercase">TOKEN NUMBER</span>
+            <span class="text-xl font-black text-emerald-400">${tokenNo}</span>
+          </div>
+          <div class="text-right">
+            <span class="block text-[10px] text-muted font-bold uppercase">TIME SLOT</span>
+            <span class="text-xs font-bold text-main">${slotStr}</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-[11px] text-muted pt-1">
+          <div>👤 <span class="font-semibold text-main">${patientName}${phoneStr}</span></div>
+          <div class="text-right">⏱ <span>${formattedDate}</span></div>
+        </div>
+
+        ${notesStr}
+
+        <div class="pt-2 border-t border-theme flex items-center justify-between text-[10px] font-mono text-muted">
+          <span>QR Verification Code:</span>
+          <span class="text-emerald-400 font-bold">${qrStr}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 /* ================= TELEMEDICINE MODULE ================= */
@@ -1357,6 +1608,137 @@ function checkAdminSession() {
       });
     }
   }
+}
+
+/* ================= PATIENT HOSPITAL DETAILS & ASSIGNED DOCTORS MODAL ================= */
+function openHospitalDetailsModal(hospName, district, address, specialty, contact, lat, lon) {
+  if (typeof closeSidebar === 'function') closeSidebar();
+  let modal = document.getElementById('patient-hospital-details-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'patient-hospital-details-modal';
+    modal.className = 'fixed inset-0 bg-black/75 backdrop-blur-sm z-[10000] flex items-center justify-center p-4';
+    modal.innerHTML = `
+      <div class="bg-card border border-theme rounded-3xl p-6 max-w-2xl w-full shadow-2xl relative max-h-[90vh] flex flex-col justify-between">
+        <div class="flex items-center justify-between border-b border-theme pb-4 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg">
+              <i class="fa-solid fa-hospital"></i>
+            </div>
+            <div>
+              <h3 id="phd-hosp-name" class="text-lg font-extrabold text-main">Hospital Details</h3>
+              <p id="phd-district" class="text-xs text-muted">District Medical Center</p>
+            </div>
+          </div>
+          <button onclick="closeHospitalDetailsModal()" class="text-muted hover:text-main text-xl font-bold p-1">✕</button>
+        </div>
+
+        <div class="space-y-4 overflow-y-auto max-h-[65vh] pr-1 flex-grow">
+          <!-- Hospital Info Card -->
+          <div class="bg-input/60 border border-theme rounded-2xl p-4 text-xs space-y-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <span class="text-muted block text-[10px] uppercase font-bold">PRIMARY SPECIALTY</span>
+                <span id="phd-specialty" class="font-semibold text-main text-xs">General Emergency</span>
+              </div>
+              <div>
+                <span class="text-muted block text-[10px] uppercase font-bold">HELPLINE / CONTACT</span>
+                <span id="phd-contact" class="font-semibold text-emerald-400 text-xs">N/A</span>
+              </div>
+            </div>
+            <div class="pt-2 border-t border-theme">
+              <span class="text-muted block text-[10px] uppercase font-bold">ADDRESS LOCATION</span>
+              <span id="phd-address" class="text-main">Address unavailable</span>
+            </div>
+          </div>
+
+          <!-- Assigned Doctors List Header -->
+          <div class="pt-2">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="font-bold text-main text-sm flex items-center gap-2">
+                <span>🩺</span> Assigned Doctors & OPD Cabin Status
+              </h4>
+              <span id="phd-doctor-count" class="text-[11px] text-muted font-mono">Loading doctors...</span>
+            </div>
+            
+            <div id="phd-doctor-list" class="space-y-3">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="pt-4 border-t border-theme flex items-center justify-between mt-4">
+          <a id="phd-directions-btn" href="map.html" class="bg-input hover:bg-emerald-500 hover:text-slate-950 text-main font-bold text-xs px-4 py-2 rounded-xl transition-all border border-theme flex items-center gap-2">
+            <i class="fa-solid fa-diamond-turn-right"></i> Get Directions & Live Map
+          </a>
+          <button onclick="closeHospitalDetailsModal()" class="bg-emerald-500 text-slate-950 font-bold px-5 py-2 rounded-xl text-xs hover:brightness-110">
+            Close
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  // Populate Hospital Data
+  const targetName = hospName || 'Medical Center';
+  const targetDist = district || 'Tamil Nadu';
+  const targetAddress = address || 'Address details unavailable';
+  const targetSpecialty = specialty || 'Multi-Specialty & Emergency Care';
+  const targetContact = contact || 'N/A';
+
+  document.getElementById('phd-hosp-name').textContent = targetName;
+  document.getElementById('phd-district').textContent = `📍 ${targetDist} District Hub`;
+  document.getElementById('phd-specialty').textContent = targetSpecialty;
+  document.getElementById('phd-contact').textContent = targetContact;
+  document.getElementById('phd-address').textContent = targetAddress;
+
+  const mapPage = window.location.pathname.endsWith('.php') ? 'map.php' : 'map.html';
+  document.getElementById('phd-directions-btn').href = `${mapPage}?search=${encodeURIComponent(targetName)}`;
+
+  // Find & Render Assigned Doctors from DOCTORS array
+  const matchedDoctors = DOCTORS.filter(d => 
+    d.hospitalName.toLowerCase().includes(targetName.toLowerCase()) || 
+    targetName.toLowerCase().includes(d.hospitalName.toLowerCase())
+  );
+
+  const countEl = document.getElementById('phd-doctor-count');
+  const listEl = document.getElementById('phd-doctor-list');
+
+  if (countEl) countEl.textContent = `${matchedDoctors.length} doctors found`;
+
+  if (matchedDoctors.length === 0) {
+    listEl.innerHTML = `
+      <div class="bg-input/60 border border-theme rounded-2xl p-6 text-center text-muted">
+        <i class="fa-solid fa-user-slash text-2xl mb-2 text-muted"></i>
+        <p class="text-xs font-bold">No assigned doctors currently registered for ${targetName}.</p>
+      </div>
+    `;
+  } else {
+    listEl.innerHTML = matchedDoctors.map(doc => {
+      return `
+        <div class="bg-card border border-theme rounded-2xl p-3.5 shadow-md flex items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <h5 class="font-extrabold text-main text-xs">${doc.name}</h5>
+              <span class="text-[10px] bg-blue-500/10 text-blue-400 font-mono px-1.5 py-0.5 rounded border border-blue-500/20">✓ ${doc.hpr || 'HPR'}</span>
+            </div>
+            <p class="text-[11px] text-muted mt-0.5">${doc.qual} · ${doc.dept}</p>
+            <p class="text-[11px] text-main font-semibold mt-0.5">🚪 ${doc.cabin}</p>
+          </div>
+          <div>${getStatusBadge(doc.status || 'in')}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  modal.classList.remove('hidden');
+}
+
+function closeHospitalDetailsModal() {
+  const modal = document.getElementById('patient-hospital-details-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 /* ================= HOSPITAL DOCTOR DRILL-DOWN & STATUS MANAGEMENT ================= */
@@ -1858,4 +2240,14 @@ document.addEventListener('DOMContentLoaded', () => {
     renderQueueGrid();
   }
   if (document.getElementById('telemed-grid')) renderTelemedGrid();
+
+  // Background timer: Auto-refresh OPD OPEN/CLOSED status badges every 60 seconds
+  if (typeof window !== 'undefined' && !window.opdStatusRefreshInterval) {
+    window.opdStatusRefreshInterval = setInterval(() => {
+      const grid = document.getElementById('doctor-grid');
+      if (grid && typeof renderDoctorGrid === 'function') {
+        renderDoctorGrid();
+      }
+    }, 60000);
+  }
 });

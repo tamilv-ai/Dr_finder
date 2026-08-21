@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS `doctors` (
   `note` TEXT NULL,
   `lat` DECIMAL(10, 8) NULL,
   `lon` DECIMAL(11, 8) NULL,
+  `opd_start_time` TIME NULL,
+  `opd_end_time` TIME NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
